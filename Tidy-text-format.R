@@ -100,3 +100,16 @@ tidy_bronte <- bronte %>%
 
 tidy_bronte %>%
   count(word,sort = TRUE)
+
+library(tidyr)
+
+frequency <- bind_rows(mutate(tidy_bronte, author = "Brontë Sisters"),
+                       mutate(tidy_hgwells, author = "H.G. Wells"), 
+                       mutate(tidy_books, author = "Jane Austen")) %>% 
+  mutate(word = str_extract(word, "[a-z']+")) %>%
+  count(author, word) %>%
+  group_by(author) %>%
+  mutate(proportion = n / sum(n)) %>% 
+  select(-n)%>% 
+  spread(author, proportion)%>% 
+  gather(author, proportion, `Brontë Sisters`:`H.G. Wells`)
